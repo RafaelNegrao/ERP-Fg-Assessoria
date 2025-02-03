@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movimentações</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="toggle-btn">☰</div>
+
+    <nav class="sidebar">
+        <a href="index.html">
+            <span class="icon"><i class="bi bi-house"></i></span>
+            <span class="text">Home</span>
+        </a>
+        <a href="dashboard.html">
+            <span class="icon"><i class="bi bi-columns-gap"></i></span>
+            <span class="text">Dashboard</span>
+        </a>
+        <a href="clientes.html">
+            <span class="icon"><i class="bi bi-person-circle"></i></span>
+            <span class="text">Clientes</span>
+        </a>
+        <a href="movimentacoes.html">
+            <span class="icon"><i class="bi bi-cash-coin"></i></span>
+            <span class="text">Movimentações</span>
+        </a>
+        <a href="configuracoes.html">
+            <span class="icon"><i class="bi bi-gear"></i></span>
+            <span class="text">Configurações</span>
+        </a>
+    </nav>
+
+
+    <div class="main-content">
+        <h2>Movimentações</h2>
+        <form id="movimentacao-form">
+            <label for="cliente">Cliente Emissor:</label>
+            <select id="cliente" required>
+                <option value="">Selecione um cliente</option>
+                <option value="Cliente A">Cliente A</option>
+                <option value="Cliente B">Cliente B</option>
+            </select>
+
+            <label for="data">Data:</label>
+            <input type="date" id="data" required>
+
+            <label for="numeroNota">Número da Nota:</label>
+            <input type="text" id="numeroNota" required>
+
+            <label for="cnpj">CNPJ do Destinatário:</label>
+            <input type="text" id="cnpj" required>
+
+            <label for="valorNota">Valor da Nota:</label>
+            <input type="number" id="valorNota" required>
+
+            <label for="observacao">Observação:</label>
+            <textarea id="observacao"></textarea>
+
+            <button type="button" id="salvarMovimentacao">Salvar</button>
+        </form>
+
+        <h3>Registros</h3>
+        <table id="tabela-movimentacoes">
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Data</th>
+                    <th>Número Nota</th>
+                    <th>CNPJ</th>
+                    <th>Valor</th>
+                    <th>Observação</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
