@@ -1,55 +1,42 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const toggleBtn = document.querySelector(".toggle-btn"); 
-    const sidebar = document.querySelector(".sidebar"); 
+    const toggleBtn = document.querySelector(".toggle-btn");
+    const sidebar = document.querySelector(".sidebar");
     const links = document.querySelectorAll(".sidebar a");
 
+    // === EXPANDIR/RECOLHER MENU ===
     toggleBtn.addEventListener("click", function () {
-        sidebar.classList.toggle("active"); 
-        toggleBtn.classList.toggle("active"); 
+        sidebar.classList.toggle("active");
+        toggleBtn.classList.toggle("active");
 
         if (sidebar.classList.contains("active")) {
             toggleBtn.textContent = "✕";
-            toggleBtn.style.color = "white"; 
+            toggleBtn.style.color = "white";
         } else {
             toggleBtn.textContent = "☰";
-            toggleBtn.style.color = "black"; 
+            toggleBtn.style.color = "black";
         }
     });
 
-    links.forEach(link => {
-        link.addEventListener("click", function (event) {
-            const page = link.getAttribute("href");
-
-            if (page.endsWith(".html")) {
-                return;
-            }
-
-            event.preventDefault();
-            carregarPagina(page.substring(1));
-        });
-    });
-
-    function carregarPagina(pagina) {
-        const contentDiv = document.getElementById("page-content");
-        if (!contentDiv) return;
-
-        fetch(`${pagina}.html`)
-            .then(response => response.text())
-            .then(html => {
-                contentDiv.innerHTML = html;
-                if (pagina === "movimentacoes") {
-                    carregarScriptMovimentacoes();
-                }
-            })
-            .catch(error => console.error("Erro ao carregar a página:", error));
-    }
-
-
     function carregarScriptMovimentacoes() {
         const botaoSalvar = document.getElementById("salvarMovimentacao");
-        if (!botaoSalvar) return;
-    
-        botaoSalvar.addEventListener("click", salvarMovimentacao);
+        const campoValorNota = document.getElementById("valorNota");
+        const campoCNPJ = document.getElementById("cnpj");
+
+        if (botaoSalvar) {
+            botaoSalvar.addEventListener("click", salvarMovimentacao);
+        }
+
+        if (campoValorNota) {
+            campoValorNota.addEventListener("input", function () {
+                formatarMoeda(this);
+            });
+        }
+
+        if (campoCNPJ) {
+            campoCNPJ.addEventListener("input", function () {
+                formatarCNPJ(this);
+            });
+        }
     }
 
     function salvarMovimentacao() {
@@ -59,14 +46,12 @@ document.addEventListener("DOMContentLoaded", function () {
         let cnpj = document.getElementById("cnpj").value.trim();
         let valorNota = document.getElementById("valorNota").value.trim();
         const municipio = document.getElementById("municipio").value.trim().toUpperCase();
-    
-        // === 1° VALIDAÇÃO: CAMPOS OBRIGATÓRIOS ===
+
         if (!cliente || !data || !numeroNota || !municipio || !cnpj || !valorNota) {
             alert("Preencha todos os campos obrigatórios.");
             return;
         }
-    
-        // === 2° FORMATAÇÃO DA DATA (AAAA-MM-DD → DD/MM/AAAA) ===
+
         const partesData = data.split("-");
         if (partesData.length === 3) {
             data = `${partesData[2]}/${partesData[1]}/${partesData[0]}`;
@@ -74,30 +59,66 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("Data inválida.");
             return;
         }
-    
-        
-        cnpj = cnpj.replace(/\D/g, ""); 
+
+        cnpj = cnpj.replace(/\D/g, "");
         if (cnpj.length !== 14) {
             alert("CNPJ inválido. Deve conter 14 dígitos.");
             return;
         }
-        cnpj = `${cnpj.slice(0, 2)}.${cnpj.slice(2, 5)}.${cnpj.slice(5, 8)}/${cnpj.slice(8, 12)}-${cnpj.slice(12, 14)}`;
-    
-      
-        valorNota = parseFloat(valorNota).toFixed(2);
-    
-       
+        cnpj = formatarCNPJString(cnpj);
+
+        valorNota = parseFloat(valorNota.replace(/\D/g, "")) / 100;
+        valorNota = valorNota.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
         const tabela = document.getElementById("tabela-movimentacoes").getElementsByTagName("tbody")[0];
         const novaLinha = tabela.insertRow();
-    
-        const colunas = [cliente, data, numeroNota, municipio, cnpj, `R$ ${valorNota}`];
+
+        const colunas = [cliente, data, numeroNota, municipio, cnpj, valorNota];
         colunas.forEach(texto => {
             let cell = novaLinha.insertCell();
             cell.textContent = texto;
         });
-    
-        // === 6° LIMPA OS CAMPOS DO FORMULÁRIO ===
-        document.getElementById("movimentacao-form").reset();
+
+        document.getElementById("data").value = "";
+        document.getElementById("numeroNota").value = "";
+        document.getElementById("cnpj").value = "";
+        document.getElementById("valorNota").value = "";
+        document.getElementById("municipio").value = "";
+
+        document.getElementById("valorNota").focus();
+    }
+
+    // === FORMATAR VALOR COMO MOEDA (R$ 0,00) ===
+    function formatarMoeda(input) {
+        let valor = input.value.replace(/\D/g, "");
+        if (valor.length === 0) {
+            input.value = "";
+            return;
+        }
+        
+        valor = (parseFloat(valor) / 100).toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL"
+        });
+
+        input.value = valor;
+    }
+
+    function formatarCNPJ(input) {
+        let cnpj = input.value.replace(/\D/g, "");
+        
+        if (cnpj.length > 14) {
+            cnpj = cnpj.substring(0, 14);
+        }
+
+        input.value = formatarCNPJString(cnpj);
+    }
+
+    function formatarCNPJString(cnpj) {
+        if (cnpj.length === 14) {
+            return `${cnpj.slice(0, 2)}.${cnpj.slice(2, 5)}.${cnpj.slice(5, 8)}/${cnpj.slice(8, 12)}-${cnpj.slice(12, 14)}`;
+        }
+        return cnpj;
     }
 
     carregarScriptMovimentacoes();
