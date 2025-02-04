@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     const toggleBtn = document.querySelector(".toggle-btn");
     const sidebar = document.querySelector(".sidebar");
-    const links = document.querySelectorAll(".sidebar a");
 
     // === EXPANDIR/RECOLHER MENU ===
     toggleBtn.addEventListener("click", function () {
@@ -9,10 +8,10 @@ document.addEventListener("DOMContentLoaded", function () {
         toggleBtn.classList.toggle("active");
 
         if (sidebar.classList.contains("active")) {
-            toggleBtn.textContent = "✕";
+            toggleBtn.innerHTML = '<i class="bi bi-x-circle"></i>'; 
             toggleBtn.style.color = "white";
         } else {
-            toggleBtn.textContent = "☰";
+            toggleBtn.innerHTML = '<i class="bi bi-list"></i>'; 
             toggleBtn.style.color = "black";
         }
     });
@@ -61,14 +60,18 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         cnpj = cnpj.replace(/\D/g, "");
-        if (cnpj.length !== 14) {
-            alert("CNPJ inválido. Deve conter 14 dígitos.");
+        if (cnpj.length !== 11 && cnpj.length !== 14) {
+            alert("Documento inválido. CPF deve ter 11 dígitos e CNPJ 14 dígitos.");
             return;
         }
         cnpj = formatarCNPJString(cnpj);
 
+        // Formatar valor monetário
         valorNota = parseFloat(valorNota.replace(/\D/g, "")) / 100;
-        valorNota = valorNota.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+        valorNota = valorNota.toLocaleString("pt-BR", { 
+            style: "currency", 
+            currency: "BRL" 
+        });
 
         const tabela = document.getElementById("tabela-movimentacoes").getElementsByTagName("tbody")[0];
         const novaLinha = tabela.insertRow();
@@ -77,6 +80,36 @@ document.addEventListener("DOMContentLoaded", function () {
         colunas.forEach(texto => {
             let cell = novaLinha.insertCell();
             cell.textContent = texto;
+        });
+
+        const cellAcoes = novaLinha.insertCell();
+        cellAcoes.innerHTML = `
+            <button class="btn-excluir">
+                <i class="bi bi-x-circle"></i>
+            </button>
+            <button class="btn-editar">
+                <i class="bi bi-pencil-square"></i>
+            </button>
+        `;
+
+        const buttons = cellAcoes.querySelectorAll('button');
+        buttons.forEach(button => {
+            button.style.fontSize = "1.5rem"; 
+            button.style.marginRight = "10px"; 
+            button.style.border = "none"; 
+            button.style.background = "none"; 
+        });
+
+        cellAcoes.querySelector('.btn-excluir').addEventListener('click', function () {
+            const linha = this.closest("tr"); 
+            linha.remove(); 
+        });
+
+        // Evento para editar linha
+        cellAcoes.querySelector('.btn-editar').addEventListener('click', function () {
+            const linha = this.closest("tr"); 
+            preencherFormularioParaEdicao(linha);
+            linha.remove(); 
         });
 
         document.getElementById("data").value = "";
@@ -88,14 +121,43 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("valorNota").focus();
     }
 
-    // === FORMATAR VALOR COMO MOEDA (R$ 0,00) ===
+    function preencherFormularioParaEdicao(linha) {
+        const cells = linha.cells;
+    
+        const clienteSelect = document.getElementById("cliente");
+        const clienteValor = cells[0].textContent.trim().toLowerCase();
+        const options = clienteSelect.options;
+    
+        for (let i = 0; i < options.length; i++) {
+            if (options[i].value.trim().toLowerCase() === clienteValor) {
+                clienteSelect.selectedIndex = i;
+                break;
+            }
+        }
+    
+        const dataParts = cells[1].textContent.split('/');
+        document.getElementById("data").value = `${dataParts[2]}-${dataParts[1]}-${dataParts[0]}`;
+    
+        document.getElementById("numeroNota").value = cells[2].textContent;
+        document.getElementById("municipio").value = cells[3].textContent;
+        document.getElementById("cnpj").value = cells[4].textContent;
+    
+        const valor = cells[5].textContent.replace(/[^\d,]/g, '').replace(',', '.');
+        const valorFormatado = parseFloat(valor).toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL"
+        });
+        document.getElementById("valorNota").value = valorFormatado;
+    }
+    
+
     function formatarMoeda(input) {
         let valor = input.value.replace(/\D/g, "");
         if (valor.length === 0) {
             input.value = "";
             return;
         }
-        
+
         valor = (parseFloat(valor) / 100).toLocaleString("pt-BR", {
             style: "currency",
             currency: "BRL"
@@ -105,20 +167,22 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function formatarCNPJ(input) {
-        let cnpj = input.value.replace(/\D/g, "");
-        
-        if (cnpj.length > 14) {
-            cnpj = cnpj.substring(0, 14);
+        let numero = input.value.replace(/\D/g, "");
+
+        if (numero.length > 14) {
+            numero = numero.substring(0, 14);
         }
 
-        input.value = formatarCNPJString(cnpj);
+        input.value = formatarCNPJString(numero);
     }
 
-    function formatarCNPJString(cnpj) {
-        if (cnpj.length === 14) {
-            return `${cnpj.slice(0, 2)}.${cnpj.slice(2, 5)}.${cnpj.slice(5, 8)}/${cnpj.slice(8, 12)}-${cnpj.slice(12, 14)}`;
+    function formatarCNPJString(numero) {
+        if (numero.length === 11) { // CPF
+            return numero.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+        } else if (numero.length === 14) { // CNPJ
+            return numero.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
         }
-        return cnpj;
+        return numero;
     }
 
     carregarScriptMovimentacoes();
