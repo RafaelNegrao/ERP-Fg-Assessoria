@@ -107,29 +107,66 @@ document.addEventListener("DOMContentLoaded", function () {
         cell.appendChild(btnExcluir);
     }
 
+
+
     function editarLinha(linha) {
-        const colunasEditaveis = [0, 1, 2, 3, 4, 5];
-        colunasEditaveis.forEach(index => {
-            let cell = linha.cells[index];
-            let valorAtual = cell.textContent;
-            let input = document.createElement("input");
-            input.type = "text";
-            input.value = valorAtual;
-            input.style.width = "100%";
-            cell.textContent = "";
-            cell.appendChild(input);
-            input.addEventListener("blur", function () {
-                if (index === 5) {
-                    let valorFormatado = formatarMoeda(input.value);
-                    cell.textContent = valorFormatado;
-                    atualizarTotal();
-                } else {
-                    cell.textContent = removeAcentos(input.value).toUpperCase();
-                }
-            });
-            input.focus();
+    const colunasEditaveis = [0, 1, 2, 3, 4, 5, 6]; // Adicionei o índice 6 (valor)
+    
+    colunasEditaveis.forEach(index => {
+        let cell = linha.cells[index];
+        let valorAtual = cell.textContent;
+        let input = document.createElement("input");
+        input.type = "text";
+        input.style.width = "100%";
+
+        // Zerar APENAS o campo do valor (índice 6) ao editar
+        input.value = index === 6 ? "" : valorAtual; // <-- Alteração principal
+
+        cell.textContent = "";
+        cell.appendChild(input);
+
+        input.addEventListener("blur", function () {
+            let novoValor = input.value.trim();
+
+            // Validação 2: Se campo vazio, define valor zerado
+            if (novoValor === "") {
+                cell.textContent = "";
+                atualizarTotal();
+                return;
+            }
+
+            // Validação 1: Formatação específica para cada campo
+            switch(index) {
+                case 3: // Número da Nota (apenas números)
+                    novoValor = novoValor.replace(/\D/g, "");
+                    break;
+                    
+                case 5: // CNPJ (formatação automática)
+                    novoValor = formatarCNPJString(novoValor.replace(/\D/g, ""));
+                    break;
+                    
+                case 1: // Data (formatação DD/MM/AAAA)
+                    if(!/^\d{2}\/\d{2}\/\d{4}$/.test(novoValor)) {
+                        novoValor = formatarData(novoValor);
+                    }
+                    break;
+                    
+                case 6: // Valor (formatação monetária)
+                    novoValor = formatarMoeda(novoValor);
+                    break;
+                    
+                default: // Demais campos (texto normal)
+                    novoValor = removeAcentos(novoValor).toUpperCase();
+            }
+
+            cell.textContent = novoValor;
+            atualizarTotal();
         });
-    }
+
+        input.focus();
+    });
+}
+
 
     function selecionarArquivosXML() {
         const input = document.createElement("input");
@@ -257,8 +294,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         let dataEmissao = xmlDoc.getElementsByTagName("dhEmi")[0]?.textContent.trim().split("T")[0];
     
                         // NOVO CAMPO: Produto (busca em tag alternativa)
-                        let produto = xmlDoc.getElementsByTagName("xProd")[0]?.textContent.trim() || "Produto não especificado";
-                        produto = removeAcentos(produto).toUpperCase();
+                        let produto =  "PRODUTO";
     
                         let numeroNota = xmlDoc.getElementsByTagName("nNF")[0]?.textContent.trim() || "";
                         numeroNota = numeroNota.toUpperCase();
