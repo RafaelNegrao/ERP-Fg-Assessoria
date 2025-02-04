@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 </head>
 <body>
-    <div class="toggle-btn">☰</div>
+    <div class="toggle-btn" style="color:black">☰</div>
 
     <nav class="sidebar">
         <a href="index.html">
@@ -35,47 +35,64 @@
 
 
     <div class="main-content">
-        <h2>Movimentações</h2>
+        
         <form id="movimentacao-form">
-            <label for="cliente">Cliente Emissor:</label>
-            <select id="cliente" required>
-                <option value="">Selecione um cliente</option>
-                <option value="Cliente A">Cliente A</option>
-                <option value="Cliente B">Cliente B</option>
-            </select>
-
-            <label for="data">Data:</label>
-            <input type="date" id="data" required>
-
-            <label for="numeroNota">Número da Nota:</label>
-            <input type="text" id="numeroNota" required>
-
-            <label for="cnpj">CNPJ do Destinatário:</label>
-            <input type="text" id="cnpj" required>
-
-            <label for="valorNota">Valor da Nota:</label>
-            <input type="number" id="valorNota" required>
-
-            <label for="observacao">Observação:</label>
-            <textarea id="observacao"></textarea>
-
-            <button type="button" id="salvarMovimentacao">Salvar</button>
+            <h2>Movimentações</h2>
+            <div class="input-group">
+                
+                <div class="input-select">
+                    <label for="cliente">Cliente Emissor:</label>
+                    <select id="cliente" required>
+                        <option value="">Selecione um cliente</option>
+                        <option value="Aldimetal equipamentos ltda">Aldimetal equipamentos ltda</option>
+                        <option value="Diesel mais ltda">Diesel mais ltda</option>
+                        <option value="Pan-dai">Pan-dai</option>
+                    </select>
+                </div>
+                <div class="input-box">
+                    <label for="data">Data:</label>
+                    <input type="date" id="data" required>
+                </div>
+                <div class="input-box">
+                    <label for="numeroNota">Número da Nota:</label>
+                    <input type="text" id="numeroNota" required>
+                </div>
+                <div class="input-box">
+                    <label for="municipio">Município do Destinatário:</label>
+                    <input type="text" id="municipio" required>
+                </div>
+                <div class="input-box">
+                    <label for="cnpj">CNPJ do Destinatário:</label>
+                    <input type="text" id="cnpj" required>
+                </div>
+                <div class="input-box">
+                    <label for="valorNota">Valor da Nota:</label>
+                    <input type="number" id="valorNota" required>
+                </div>
+            </div>
+            <div class="btn-salvar">
+                <button type="button" id="salvarMovimentacao">Salvar</button>
+            </div>
+            <div class="btn-upload-xml">
+                <button type="button" id="uploadXml"><i class="bi bi-upload"></i> Upload XML</button>
+            </div>
         </form>
-
-        <h3>Registros</h3>
-        <table id="tabela-movimentacoes">
-            <thead>
-                <tr>
-                    <th>Cliente</th>
-                    <th>Data</th>
-                    <th>Número Nota</th>
-                    <th>CNPJ</th>
-                    <th>Valor</th>
-                    <th>Observação</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+        <div class="div-tabela">
+            <h3>Registros</h3>
+            <table id="tabela-movimentacoes">
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Data</th>
+                        <th>Número Nota</th>
+                        <th>Município</th>
+                        <th>CNPJ</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </div>
 
     <script src="script.js"></script>
