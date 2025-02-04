@@ -1,8 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Poppins', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
@@ -19,27 +21,26 @@ body {
     padding-top: 20px;
     transition: 0.3s;
     z-index: 1000;
-    overflow-x: hidden;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar a {
-    padding: 15px 25px;
+    padding: 29px 25px;
     text-decoration: none;
-    color: #bdc3c7;
+    color: #e9eef1;
     display: flex;
     align-items: center;
     transition: 0.2s;
     white-space: nowrap;
 }
 
+.sidebar a:first-child {
+    margin-top: 45px;
+}
+
 .sidebar a .icon {
     font-size: 1.4em;
     min-width: 40px;
-}
-
-.sidebar a .text {
-    opacity: 1;
-    transition: opacity 0.3s;
 }
 
 .sidebar a:hover {
@@ -49,49 +50,131 @@ body {
 
 .main-content {
     margin-left: 250px;
-    padding: 25px;
+    padding: 50px 250px;
     min-height: 100vh;
     background-color: #f5f6fa;
     transition: margin-left 0.3s;
+}
+
+.btn {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: right;
+    margin-top: 1rem;
+    margin-right: 1rem;
+    gap:15px;
+}
+
+.btn button{
+    background-color: #34495e;
+    color: white;
+    font-size: 18px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.btn-salvar button:hover,
+.btn-upload-xml button:hover {
+    background-color: #2c3e50;
+}
+.input-group > .input-select{
+    width: 100%;
+}   
+
+h2 {
+    margin-left: 15px;
+}
+
+h3 {
+    margin: 20px 0 10px;
+}
+
+.input-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 1rem;
+    gap: 15px;
+}
+
+.input-box,
+.input-select {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.1rem;
+    width: 200px;
+    gap: 8px;
+}
+
+.input-box input,
+.input-group select {
+    padding: 0.8rem 1.2rem;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 1px 1px 6px #0000001c;
+}
+
+.input-box input:hover,
+.input-group select:hover {
+    background-color: #eeeeee75;
+}
+
+.input-box input:focus-visible {
+    outline: 1px solid #34495e;
+}
+
+.div-tabela {
+    margin: 0 1rem;
+}
+
+#tabela-movimentacoes {
+    width: 100%;
+    border-collapse: collapse;
+    box-shadow: 1px 1px 6px #0000001c;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+#tabela-movimentacoes thead {
+    background-color: #34495e;
+    color: white;
+    text-align: center;
+}
+
+#tabela-movimentacoes th,
+#tabela-movimentacoes td {
+    padding: 1rem;
+}
+
+#tabela-movimentacoes td {
+    border-bottom: 1px solid #ccc;
+}
+
+#tabela-movimentacoes tbody tr:nth-child(odd) {
+    background-color: #f9f9f9;
+}
+
+#tabela-movimentacoes tbody tr:nth-child(even) {
+    background-color: #ffffff;
+}
+
+#tabela-movimentacoes tbody tr:hover {
+    background-color: #eeeeee75;
 }
 
 .toggle-btn {
     position: fixed;
     left: 20px;
     top: 20px;
-    font-size: 30px;
+    font-size: 28px;
     cursor: pointer;
     display: none;
     z-index: 1001;
     color: #2c3e50;
-}
-
-@media screen and (min-width: 769px) {
-    .sidebar {
-        width: 70px;
-    }
-    
-    .sidebar:hover {
-        width: 250px;
-    }
-
-    .sidebar .text {
-        opacity: 0;
-        margin-left: 15px;
-    }
-
-    .sidebar:hover .text {
-        opacity: 1;
-        transition-delay: 0.2s;
-    }
-
-    .main-content {
-        margin-left: 70px;
-    }
-
-    .sidebar:hover ~ .main-content {
-        margin-left: 250px;
-    }
+    margin-left: 5px;
 }
 
 @media screen and (max-width: 768px) {
@@ -100,11 +183,15 @@ body {
     }
 
     .main-content {
-        margin-left: 60px;
+        margin-left: 0px;
+        padding: 100px;
     }
 
     .toggle-btn {
         display: block;
+        color: #ecf0f1;
+        cursor: pointer;
+        transition: color 0.3s ease-in-out, background-color 0.3s ease-in-out;
     }
 
     .sidebar.active {
