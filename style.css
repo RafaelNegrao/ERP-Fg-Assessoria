@@ -68,7 +68,7 @@ body {
 
 @media screen and (min-width: 769px) {
     .sidebar {
-        width: 80px;
+        width: 70px;
     }
     
     .sidebar:hover {
@@ -86,7 +86,7 @@ body {
     }
 
     .main-content {
-        margin-left: 80px;
+        margin-left: 70px;
     }
 
     .sidebar:hover ~ .main-content {
@@ -100,7 +100,7 @@ body {
     }
 
     .main-content {
-        margin-left: 0;
+        margin-left: 60px;
     }
 
     .toggle-btn {
@@ -112,6 +112,6 @@ body {
     }
 
     .main-content.active {
-        margin-left: 250px;
+        margin-left: 400px;
     }
 }

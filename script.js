@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Se o link for para uma página externa, apenas segue o link
             if (page.endsWith(".html")) {
-                return; // Deixa o navegador seguir o link normalmente
+                return; 
             }
 
             event.preventDefault();
