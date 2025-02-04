@@ -20,23 +20,17 @@ document.addEventListener("DOMContentLoaded", function () {
     links.forEach(link => {
         link.addEventListener("click", function (event) {
             const page = link.getAttribute("href");
-
             if (page.endsWith(".html")) {
                 return;
             }
-
             event.preventDefault();
             carregarPagina(page.substring(1));
         });
     });
 
-
-
-
     function carregarPagina(pagina) {
         const contentDiv = document.getElementById("page-content");
         if (!contentDiv) return;
-
         fetch(`${pagina}.html`)
             .then(response => response.text())
             .then(html => {
@@ -48,63 +42,49 @@ document.addEventListener("DOMContentLoaded", function () {
             .catch(error => console.error("Erro ao carregar a página:", error));
     }
 
-
-
     function carregarScriptMovimentacoes() {
         const botaoSalvar = document.getElementById("salvarMovimentacao");
         if (!botaoSalvar) return;
-
         botaoSalvar.addEventListener("click", salvarMovimentacao);
     }
 
-
-
-
     function salvarMovimentacao() {
-        const cliente = document.getElementById("cliente").value.trim().toUpperCase();
+        let cliente = document.getElementById("cliente").value.trim();
         let data = document.getElementById("data").value.trim();
-        const numeroNota = document.getElementById("numeroNota").value.trim().toUpperCase();
+        let numeroNota = document.getElementById("numeroNota").value.trim();
         let cnpj = document.getElementById("cnpj").value.trim();
         let valorNota = document.getElementById("valorNota").value.trim();
-        const municipio = document.getElementById("municipio").value.trim().toUpperCase();
+        let municipio = document.getElementById("municipio").value.trim();
 
         if (!cliente || !data || !numeroNota || !municipio || !cnpj || !valorNota) {
             alert("Preencha todos os campos obrigatórios.");
             return;
         }
 
-        const partesData = data.split("-");
-        if (partesData.length === 3) {
-            data = `${partesData[2]}/${partesData[1]}/${partesData[0]}`;
-        } else {
-            alert("Data inválida.");
-            return;
-        }
-
+        // Remover acentos manualmente e converter para maiúsculas
+        cliente = removeAcentos(cliente).toUpperCase();
+        data = data.split("-").length === 3
+            ? `${data.split("-")[2]}/${data.split("-")[1]}/${data.split("-")[0]}`
+            : (alert("Data inválida."), data);
+        numeroNota = numeroNota.toUpperCase();
+        municipio = removeAcentos(municipio).toUpperCase();
         cnpj = formatarCNPJString(cnpj);
         valorNota = formatarMoeda(valorNota);
 
         const tabela = document.getElementById("tabela-movimentacoes").getElementsByTagName("tbody")[0];
         const novaLinha = tabela.insertRow();
-
         const colunas = [cliente, data, numeroNota, municipio, cnpj, valorNota];
         colunas.forEach(texto => {
             let cell = novaLinha.insertCell();
             cell.textContent = texto;
         });
-
         adicionarBotoesAcao(novaLinha);
-
+        atualizarTotal();
         document.getElementById("movimentacao-form").reset();
     }
 
-
-
-
-
     function adicionarBotoesAcao(linha) {
         let cell = linha.insertCell();
-
         const btnEditar = document.createElement("span");
         btnEditar.innerHTML = `<i class="bi bi-pencil-square"></i>`;
         btnEditar.style.cursor = "pointer";
@@ -120,168 +100,298 @@ document.addEventListener("DOMContentLoaded", function () {
         btnExcluir.title = "Excluir";
         btnExcluir.onclick = function () {
             linha.remove();
+            atualizarTotal();
         };
 
         cell.appendChild(btnEditar);
         cell.appendChild(btnExcluir);
     }
 
-
-
-
-
     function editarLinha(linha) {
         const colunasEditaveis = [0, 1, 2, 3, 4, 5];
-
         colunasEditaveis.forEach(index => {
             let cell = linha.cells[index];
             let valorAtual = cell.textContent;
-
             let input = document.createElement("input");
             input.type = "text";
             input.value = valorAtual;
             input.style.width = "100%";
-
             cell.textContent = "";
             cell.appendChild(input);
-
             input.addEventListener("blur", function () {
                 if (index === 5) {
-                    // Se for a coluna do valor, formatar como moeda
                     let valorFormatado = formatarMoeda(input.value);
                     cell.textContent = valorFormatado;
+                    atualizarTotal();
                 } else {
-                    cell.textContent = input.value;
+                    cell.textContent = removeAcentos(input.value).toUpperCase();
                 }
             });
-
             input.focus();
         });
     }
-
-
-
 
     function selecionarArquivosXML() {
         const input = document.createElement("input");
         input.type = "file";
         input.accept = ".xml";
         input.multiple = true;
-
         input.addEventListener("change", function (event) {
             const arquivos = event.target.files;
-
             if (!arquivos.length) {
                 alert("Nenhum arquivo foi selecionado. Por favor, selecione pelo menos um arquivo XML.");
                 return;
             }
-
             processarArquivosXML(arquivos);
         });
-
         input.click();
     }
 
-
-
-
     function processarArquivosXML(arquivos) {
         const tabela = document.getElementById("tabela-movimentacoes").getElementsByTagName("tbody")[0];
-        let contadorNotasImportadas = 0; // Variável para contar as notas importadas corretamente
+        let contadorNotasImportadas = 0;
+        let valorTotal = 0;
     
         for (const arquivo of arquivos) {
             const leitor = new FileReader();
-    
             leitor.onload = function (e) {
+                const decoder = new TextDecoder('ISO-8859-1');
+                const texto = decoder.decode(e.target.result);
                 const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(e.target.result, "text/xml");
+                const xmlDoc = parser.parseFromString(texto, "text/xml");
     
                 try {
-                    const cliente = xmlDoc.getElementsByTagName("xNome")[1]?.textContent.trim();
-                    const bairro = xmlDoc.getElementsByTagName("xBairro")[0]?.textContent.trim();
-                    const municipio = xmlDoc.getElementsByTagName("xMun")[0]?.textContent.trim();
-                    const dataEmissao = xmlDoc.getElementsByTagName("dhEmi")[0]?.textContent.trim().split("T")[0];
-                    const numeroNota = xmlDoc.getElementsByTagName("nNF")[0]?.textContent.trim();
-                    const cnpjDest = xmlDoc.getElementsByTagName("CNPJ")[1]?.textContent.trim();
-                    const valorNota = xmlDoc.getElementsByTagName("vPag")[0]?.textContent.trim();
+                    // Processa estrutura nova (nfdok)
+                    const nfdoks = xmlDoc.getElementsByTagName("nfdok");
+                    if (nfdoks.length > 0) {
+                        for (let i = 0; i < nfdoks.length; i++) {
+                            const doc = nfdoks[i];
+                            let situacao = doc.getElementsByTagName("SituacaoNf")[0]?.textContent.trim() || "Normal";
+                            if (situacao.toUpperCase() !== "NORMAL") continue;
     
-                    // Verificar se já existe uma nota com o mesmo número para o mesmo cliente
-                    let notaExistente = false;
-                    const linhasTabela = tabela.getElementsByTagName("tr");
+                            // Extrai dados
+                            let cliente = doc.getElementsByTagName("ClienteNomeRazaoSocial")[0]?.textContent.trim() || "";
+                            cliente = removeAcentos(cliente.replace(/�/g, 'A')).toUpperCase();
     
-                    for (const linha of linhasTabela) {
-                        const colunaCliente = linha.cells[0]?.textContent.trim();
-                        const colunaNumeroNota = linha.cells[2]?.textContent.trim();
+                            let dataEmissao = doc.getElementsByTagName("DataEmissao")[0]?.textContent.trim() || "";
+                            dataEmissao = dataEmissao.split(" ")[0];
     
-                        if (colunaCliente === cliente && colunaNumeroNota === numeroNota) {
-                            notaExistente = true;
-                            break;
+                            // NOVO CAMPO: Produto
+                            let produto = doc.getElementsByTagName("DescricaoServico")[0]?.textContent.trim() || "Produto";
+                            produto = removeAcentos(produto).toUpperCase();
+    
+                            let numeroNota = doc.getElementsByTagName("NumeroNota")[0]?.textContent.trim() || "";
+                            numeroNota = numeroNota.toUpperCase();
+    
+                            let municipio = doc.getElementsByTagName("ClienteCidade")[0]?.textContent.trim() || "";
+                            municipio = removeAcentos(municipio.replace(/�/g, 'A')).toUpperCase();
+    
+                            let uf = doc.getElementsByTagName("ClienteUF")[0]?.textContent.trim() || "";
+                            uf = removeAcentos(uf).toUpperCase();
+                            const local = municipio && uf ? `${municipio} - ${uf}` : municipio || uf;
+    
+                            let cnpjDest = doc.getElementsByTagName("ClienteCNPJCPF")[0]?.textContent.trim() || "";
+                            cnpjDest = cnpjDest.replace(/\D/g, "");
+                            if (cnpjDest.length === 14) cnpjDest = formatarCNPJString(cnpjDest);
+    
+                            const valorNota = doc.getElementsByTagName("ValorTotalNota")[0]?.textContent.trim();
+    
+                            // Verifica duplicidade (agora considerando produto)
+                            let notaExistente = false;
+                            const linhasTabela = tabela.getElementsByTagName("tr");
+                            for (const linha of linhasTabela) {
+                                const colunaCliente = linha.cells[0]?.textContent.trim();
+                                const colunaProduto = linha.cells[2]?.textContent.trim();
+                                const colunaNumeroNota = linha.cells[3]?.textContent.trim();
+                                
+                                if (
+                                    colunaCliente === cliente && 
+                                    colunaProduto === produto && 
+                                    colunaNumeroNota === numeroNota
+                                ) {
+                                    notaExistente = true;
+                                    break;
+                                }
+                            }
+    
+                            if (!notaExistente) {
+                                const novaLinha = tabela.insertRow();
+                                const colunas = [
+                                    cliente,
+                                    formatarData(dataEmissao),
+                                    produto, // Nova coluna
+                                    numeroNota,
+                                    local,
+                                    cnpjDest,
+                                    formatarMoeda(valorNota)
+                                ];
+    
+                                colunas.forEach(texto => {
+                                    let cell = novaLinha.insertCell();
+                                    cell.textContent = texto;
+                                });
+    
+                                adicionarBotoesAcao(novaLinha);
+                                
+                                // Soma corrigida
+                                const valorNumerico = parseFloat(
+                                    valorNota.replace("R$", "")
+                                            .replace(/\./g, "")
+                                            .replace(",", ".")
+                                );
+                                if (!isNaN(valorNumerico)) valorTotal += valorNumerico;
+                                
+                                contadorNotasImportadas++;
+                            }
+                        }
+                    } 
+                    // Processa estrutura antiga
+                    else {
+                        let situacao = xmlDoc.getElementsByTagName("SituacaoNf")[0]?.textContent.trim() || "Normal";
+                        if (situacao.toUpperCase() !== "NORMAL") return;
+    
+                        // Extrai dados
+                        let cliente = xmlDoc.getElementsByTagName("xNome")[1]?.textContent.trim() || "";
+                        cliente = removeAcentos(cliente.replace(/�/g, 'A')).toUpperCase();
+    
+                        let dataEmissao = xmlDoc.getElementsByTagName("dhEmi")[0]?.textContent.trim().split("T")[0];
+    
+                        // NOVO CAMPO: Produto (busca em tag alternativa)
+                        let produto = xmlDoc.getElementsByTagName("xProd")[0]?.textContent.trim() || "Produto não especificado";
+                        produto = removeAcentos(produto).toUpperCase();
+    
+                        let numeroNota = xmlDoc.getElementsByTagName("nNF")[0]?.textContent.trim() || "";
+                        numeroNota = numeroNota.toUpperCase();
+    
+                        let bairro = xmlDoc.getElementsByTagName("xBairro")[0]?.textContent.trim() || "";
+                        bairro = removeAcentos(bairro.replace(/�/g, 'A')).toUpperCase();
+    
+                        let municipio = xmlDoc.getElementsByTagName("xMun")[0]?.textContent.trim() || "";
+                        municipio = removeAcentos(municipio).toUpperCase();
+                        const local = `${bairro} - ${municipio}`;
+    
+                        let cnpjDest = xmlDoc.getElementsByTagName("CNPJ")[1]?.textContent.trim() || "";
+                        cnpjDest = cnpjDest.replace(/\D/g, "");
+                        if (cnpjDest.length === 14) cnpjDest = formatarCNPJString(cnpjDest);
+    
+                        const valorNota = xmlDoc.getElementsByTagName("vPag")[0]?.textContent.trim();
+    
+                        // Verifica duplicidade
+                        let notaExistente = false;
+                        const linhasTabela = tabela.getElementsByTagName("tr");
+                        for (const linha of linhasTabela) {
+                            const colunaCliente = linha.cells[0]?.textContent.trim();
+                            const colunaProduto = linha.cells[2]?.textContent.trim();
+                            const colunaNumeroNota = linha.cells[3]?.textContent.trim();
+                            
+                            if (
+                                colunaCliente === cliente && 
+                                colunaProduto === produto && 
+                                colunaNumeroNota === numeroNota
+                            ) {
+                                notaExistente = true;
+                                break;
+                            }
+                        }
+    
+                        if (!notaExistente) {
+                            const novaLinha = tabela.insertRow();
+                            const colunas = [
+                                cliente,
+                                formatarData(dataEmissao),
+                                produto, // Nova coluna
+                                numeroNota,
+                                local,
+                                cnpjDest,
+                                formatarMoeda(valorNota)
+                            ];
+    
+                            colunas.forEach(texto => {
+                                let cell = novaLinha.insertCell();
+                                cell.textContent = texto;
+                            });
+    
+                            adicionarBotoesAcao(novaLinha);
+                            
+                            const valorNumerico = parseFloat(
+                                valorNota.replace("R$", "")
+                                        .replace(/\./g, "")
+                                        .replace(",", ".")
+                            );
+                            if (!isNaN(valorNumerico)) valorTotal += valorNumerico;
+                            
+                            contadorNotasImportadas++;
                         }
                     }
-    
-                    if (!notaExistente) {
-                        // Se não encontrou nenhuma nota com o mesmo número para o mesmo cliente, adiciona
-                        const novaLinha = tabela.insertRow();
-                        const colunas = [
-                            cliente,
-                            formatarData(dataEmissao),
-                            numeroNota,
-                            `${bairro} - ${municipio}`,
-                            formatarCNPJString(cnpjDest),
-                            formatarMoeda(valorNota)
-                        ];
-    
-                        colunas.forEach(texto => {
-                            let cell = novaLinha.insertCell();
-                            cell.textContent = texto;
-                        });
-    
-                        adicionarBotoesAcao(novaLinha);
-    
-                        contadorNotasImportadas++; // Incrementa o contador
-                    }
-    
                 } catch (error) {
-                    console.error(`Erro ao processar o arquivo: ${arquivo.name}. Verifique se é um XML de NFe válido.`);
+                    console.error(`Erro ao processar ${arquivo.name}:`, error);
                 }
             };
-    
-            leitor.readAsText(arquivo);
+            leitor.readAsArrayBuffer(arquivo);
         }
     
-        // Atualizar a label com a quantidade de notas importadas
-        const label = document.getElementById("label-notas-importadas");
-        if (label) {
-            label.textContent = `Notas importadas corretamente: ${contadorNotasImportadas}`;
-        }
+        // Atualiza UI após processar todos os arquivos
+        setTimeout(() => {
+            atualizarTotal(valorTotal);
+            document.getElementById("label-notas-importadas").textContent = 
+                `Notas importadas corretamente: ${contadorNotasImportadas}`;
+        }, 100);
     }
-    
-    
 
 
+
+
+
+
+    function atualizarTotal() {
+    let total = 0;
+    const linhas = document.querySelectorAll("#tabela-movimentacoes tbody tr");
+    
+    linhas.forEach(linha => {
+        const valorCell = linha.cells[6].textContent; // 7ª coluna (índice 6)
+        const valorNumerico = parseFloat(
+            valorCell.replace("R$", "")
+                    .replace(/\./g, "")
+                    .replace(",", ".")
+                    .trim()
+        );
+        if (!isNaN(valorNumerico)) {
+            total += valorNumerico;
+        }
+    });
+
+    document.getElementById("total-valor").innerHTML = 
+        `<strong>R$ ${total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong>`;
+}
 
     function formatarData(data) {
         const partes = data.split("-");
         return partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : data;
     }
 
-
-
     function formatarMoeda(valor) {
         return parseFloat(valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
     }
-
-
 
     function formatarCNPJString(cnpj) {
         cnpj = cnpj.replace(/\D/g, "");
         return `${cnpj.slice(0, 2)}.${cnpj.slice(2, 5)}.${cnpj.slice(5, 8)}/${cnpj.slice(8, 12)}-${cnpj.slice(12, 14)}`;
     }
 
+    // Função para substituir manualmente caracteres acentuados por suas versões sem acento
+    function removeAcentos(texto) {
+        if (!texto) return "";
+        return texto
+            .normalize('NFD') // Decompõe os caracteres acentuados em seus componentes (ex: 'é' vira 'e' + '´')
+            .replace(/[\u0300-\u036f]/g, ''); // Remove todos os caracteres de acentuação
+    }
+
     if (uploadBtn) {
         uploadBtn.addEventListener("click", selecionarArquivosXML);
     }
 
+
     
+
     carregarScriptMovimentacoes();
 });

@@ -69,16 +69,16 @@ body {
     display: flex;
     flex-wrap: wrap;
     justify-content: right;
-    margin-top: 1rem;
+    margin-top: 1.6rem;
     margin-right: 1rem;
-    gap:5px;
+    gap:8px;
 }
 
 .btn button{
     background-color: #34495e;
     color: white;
     font-size: 18px;
-    padding: 10px 20px;
+    padding: 10px 20px ;
     border: none;
     border-radius: 8px;
     cursor: pointer;
@@ -101,7 +101,7 @@ h3 {
     margin: 20px 0 10px;
 }
 
-.input-group {
+.input-group ,.input-box{
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -109,27 +109,13 @@ h3 {
     gap: 15px;
 }
 
-.input-box,
-.input-select {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 1.1rem;
-    width: 100%; /* Tamanho flexível para os outros campos */
-    gap: 8px;
-}
-
-.input-group > .input-select,
-.input-group > .input-box {
-    width: 31%; /* Ajusta o tamanho para os três primeiros campos */
-}
-
-.input-group > .input-select {
-    width: 30%; /* Ajuste para o campo "Cliente Emissor" */
+.input-group > .input-select{
+    width: 70%; 
 }
 
 .input-box input,
 .input-group select {
-    padding: 0.8rem 1.2rem;
+    padding: 0.8rem 1rem;
     border: none;
     border-radius: 10px;
     box-shadow: 1px 1px 6px #0000001c;
@@ -168,16 +154,23 @@ label {
     background-color: #34495e;
     color: white;
     text-align: center;
-    font-size: 0.9rem;
+    font-size: 0.80rem;
 }
 
 #tabela-movimentacoes th,
 #tabela-movimentacoes td {
     padding: 1rem;
+    font-size: 0.80rem;
+    text-align: center;
+    width: auto; 
+    white-space: nowrap; 
+    word-wrap: break-word;
+    white-space: normal;
 }
 
 #tabela-movimentacoes td {
     border-bottom: 1px solid #ccc;
+    font-size: 0.8rem;
 }
 
 #tabela-movimentacoes tbody tr:nth-child(odd) {
@@ -190,6 +183,34 @@ label {
 
 #tabela-movimentacoes tbody tr:hover {
     background-color: #eeeeee75;
+}
+
+
+
+#tabela-movimentacoes thead,
+#tabela-movimentacoes tfoot {
+    display: table;
+    width: 100%;
+    table-layout: fixed; /* Mantém o alinhamento das colunas */
+}
+
+#tabela-movimentacoes tbody {
+    display: block;
+    max-height: 300px; /* Ativa o scroll quando houver mais de 5 itens */
+    overflow-y: auto;
+    width: 100%;
+}
+.div-tabela {
+    width: 100%;
+    max-height: 500px;/* Atera o tamanho da tabela inteira*/
+    overflow: hidden;
+    position: relative;
+}
+
+#tabela-movimentacoes tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed; /* Mantém a largura das colunas fixa */
 }
 
 .toggle-btn {
@@ -221,7 +242,7 @@ label {
     .main-content {
         margin-left: 0px;
         padding-top: 60px;  /* Modificado de 100px para 20px */
-        transition: none;
+        transition: none;    
     }
 
     .toggle-btn {
@@ -234,4 +255,5 @@ label {
     .sidebar.active {
         left: 0;
     }
+    
 }
