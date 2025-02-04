@@ -1,42 +1,64 @@
 document.addEventListener("DOMContentLoaded", function () {
     const toggleBtn = document.querySelector(".toggle-btn");
     const sidebar = document.querySelector(".sidebar");
+    const links = document.querySelectorAll(".sidebar a");
+    const uploadBtn = document.getElementById("uploadXml");
 
-    // === EXPANDIR/RECOLHER MENU ===
     toggleBtn.addEventListener("click", function () {
         sidebar.classList.toggle("active");
         toggleBtn.classList.toggle("active");
 
         if (sidebar.classList.contains("active")) {
-            toggleBtn.innerHTML = '<i class="bi bi-x-circle"></i>'; 
+            toggleBtn.textContent = "✕";
             toggleBtn.style.color = "white";
         } else {
-            toggleBtn.innerHTML = '<i class="bi bi-list"></i>'; 
+            toggleBtn.textContent = "☰";
             toggleBtn.style.color = "black";
         }
     });
 
+    links.forEach(link => {
+        link.addEventListener("click", function (event) {
+            const page = link.getAttribute("href");
+
+            if (page.endsWith(".html")) {
+                return;
+            }
+
+            event.preventDefault();
+            carregarPagina(page.substring(1));
+        });
+    });
+
+
+
+
+    function carregarPagina(pagina) {
+        const contentDiv = document.getElementById("page-content");
+        if (!contentDiv) return;
+
+        fetch(`${pagina}.html`)
+            .then(response => response.text())
+            .then(html => {
+                contentDiv.innerHTML = html;
+                if (pagina === "movimentacoes") {
+                    carregarScriptMovimentacoes();
+                }
+            })
+            .catch(error => console.error("Erro ao carregar a página:", error));
+    }
+
+
+
     function carregarScriptMovimentacoes() {
         const botaoSalvar = document.getElementById("salvarMovimentacao");
-        const campoValorNota = document.getElementById("valorNota");
-        const campoCNPJ = document.getElementById("cnpj");
+        if (!botaoSalvar) return;
 
-        if (botaoSalvar) {
-            botaoSalvar.addEventListener("click", salvarMovimentacao);
-        }
-
-        if (campoValorNota) {
-            campoValorNota.addEventListener("input", function () {
-                formatarMoeda(this);
-            });
-        }
-
-        if (campoCNPJ) {
-            campoCNPJ.addEventListener("input", function () {
-                formatarCNPJ(this);
-            });
-        }
+        botaoSalvar.addEventListener("click", salvarMovimentacao);
     }
+
+
+
 
     function salvarMovimentacao() {
         const cliente = document.getElementById("cliente").value.trim().toUpperCase();
@@ -59,19 +81,8 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        cnpj = cnpj.replace(/\D/g, "");
-        if (cnpj.length !== 11 && cnpj.length !== 14) {
-            alert("Documento inválido. CPF deve ter 11 dígitos e CNPJ 14 dígitos.");
-            return;
-        }
         cnpj = formatarCNPJString(cnpj);
-
-        // Formatar valor monetário
-        valorNota = parseFloat(valorNota.replace(/\D/g, "")) / 100;
-        valorNota = valorNota.toLocaleString("pt-BR", { 
-            style: "currency", 
-            currency: "BRL" 
-        });
+        valorNota = formatarMoeda(valorNota);
 
         const tabela = document.getElementById("tabela-movimentacoes").getElementsByTagName("tbody")[0];
         const novaLinha = tabela.insertRow();
@@ -82,108 +93,195 @@ document.addEventListener("DOMContentLoaded", function () {
             cell.textContent = texto;
         });
 
-        const cellAcoes = novaLinha.insertCell();
-        cellAcoes.innerHTML = `
-            <button class="btn-excluir">
-                <i class="bi bi-x-circle"></i>
-            </button>
-            <button class="btn-editar">
-                <i class="bi bi-pencil-square"></i>
-            </button>
-        `;
+        adicionarBotoesAcao(novaLinha);
 
-        const buttons = cellAcoes.querySelectorAll('button');
-        buttons.forEach(button => {
-            button.style.fontSize = "1.5rem"; 
-            button.style.marginRight = "10px"; 
-            button.style.border = "none"; 
-            button.style.background = "none"; 
-        });
-
-        cellAcoes.querySelector('.btn-excluir').addEventListener('click', function () {
-            const linha = this.closest("tr"); 
-            linha.remove(); 
-        });
-
-        // Evento para editar linha
-        cellAcoes.querySelector('.btn-editar').addEventListener('click', function () {
-            const linha = this.closest("tr"); 
-            preencherFormularioParaEdicao(linha);
-            linha.remove(); 
-        });
-
-        document.getElementById("data").value = "";
-        document.getElementById("numeroNota").value = "";
-        document.getElementById("cnpj").value = "";
-        document.getElementById("valorNota").value = "";
-        document.getElementById("municipio").value = "";
-
-        document.getElementById("valorNota").focus();
+        document.getElementById("movimentacao-form").reset();
     }
 
-    function preencherFormularioParaEdicao(linha) {
-        const cells = linha.cells;
-    
-        const clienteSelect = document.getElementById("cliente");
-        const clienteValor = cells[0].textContent.trim().toLowerCase();
-        const options = clienteSelect.options;
-    
-        for (let i = 0; i < options.length; i++) {
-            if (options[i].value.trim().toLowerCase() === clienteValor) {
-                clienteSelect.selectedIndex = i;
-                break;
+
+
+
+
+    function adicionarBotoesAcao(linha) {
+        let cell = linha.insertCell();
+
+        const btnEditar = document.createElement("span");
+        btnEditar.innerHTML = `<i class="bi bi-pencil-square"></i>`;
+        btnEditar.style.cursor = "pointer";
+        btnEditar.style.marginRight = "10px";
+        btnEditar.title = "Editar";
+        btnEditar.onclick = function () {
+            editarLinha(linha);
+        };
+
+        const btnExcluir = document.createElement("span");
+        btnExcluir.innerHTML = `<i class="bi bi-x-circle"></i>`;
+        btnExcluir.style.cursor = "pointer";
+        btnExcluir.title = "Excluir";
+        btnExcluir.onclick = function () {
+            linha.remove();
+        };
+
+        cell.appendChild(btnEditar);
+        cell.appendChild(btnExcluir);
+    }
+
+
+
+
+
+    function editarLinha(linha) {
+        const colunasEditaveis = [0, 1, 2, 3, 4, 5];
+
+        colunasEditaveis.forEach(index => {
+            let cell = linha.cells[index];
+            let valorAtual = cell.textContent;
+
+            let input = document.createElement("input");
+            input.type = "text";
+            input.value = valorAtual;
+            input.style.width = "100%";
+
+            cell.textContent = "";
+            cell.appendChild(input);
+
+            input.addEventListener("blur", function () {
+                if (index === 5) {
+                    // Se for a coluna do valor, formatar como moeda
+                    let valorFormatado = formatarMoeda(input.value);
+                    cell.textContent = valorFormatado;
+                } else {
+                    cell.textContent = input.value;
+                }
+            });
+
+            input.focus();
+        });
+    }
+
+
+
+
+    function selecionarArquivosXML() {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = ".xml";
+        input.multiple = true;
+
+        input.addEventListener("change", function (event) {
+            const arquivos = event.target.files;
+
+            if (!arquivos.length) {
+                alert("Nenhum arquivo foi selecionado. Por favor, selecione pelo menos um arquivo XML.");
+                return;
             }
-        }
-    
-        const dataParts = cells[1].textContent.split('/');
-        document.getElementById("data").value = `${dataParts[2]}-${dataParts[1]}-${dataParts[0]}`;
-    
-        document.getElementById("numeroNota").value = cells[2].textContent;
-        document.getElementById("municipio").value = cells[3].textContent;
-        document.getElementById("cnpj").value = cells[4].textContent;
-    
-        const valor = cells[5].textContent.replace(/[^\d,]/g, '').replace(',', '.');
-        const valorFormatado = parseFloat(valor).toLocaleString("pt-BR", {
-            style: "currency",
-            currency: "BRL"
-        });
-        document.getElementById("valorNota").value = valorFormatado;
-    }
-    
 
-    function formatarMoeda(input) {
-        let valor = input.value.replace(/\D/g, "");
-        if (valor.length === 0) {
-            input.value = "";
-            return;
-        }
-
-        valor = (parseFloat(valor) / 100).toLocaleString("pt-BR", {
-            style: "currency",
-            currency: "BRL"
+            processarArquivosXML(arquivos);
         });
 
-        input.value = valor;
+        input.click();
     }
 
-    function formatarCNPJ(input) {
-        let numero = input.value.replace(/\D/g, "");
 
-        if (numero.length > 14) {
-            numero = numero.substring(0, 14);
+
+
+    function processarArquivosXML(arquivos) {
+        const tabela = document.getElementById("tabela-movimentacoes").getElementsByTagName("tbody")[0];
+        let contadorNotasImportadas = 0; // Variável para contar as notas importadas corretamente
+    
+        for (const arquivo of arquivos) {
+            const leitor = new FileReader();
+    
+            leitor.onload = function (e) {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(e.target.result, "text/xml");
+    
+                try {
+                    const cliente = xmlDoc.getElementsByTagName("xNome")[1]?.textContent.trim();
+                    const bairro = xmlDoc.getElementsByTagName("xBairro")[0]?.textContent.trim();
+                    const municipio = xmlDoc.getElementsByTagName("xMun")[0]?.textContent.trim();
+                    const dataEmissao = xmlDoc.getElementsByTagName("dhEmi")[0]?.textContent.trim().split("T")[0];
+                    const numeroNota = xmlDoc.getElementsByTagName("nNF")[0]?.textContent.trim();
+                    const cnpjDest = xmlDoc.getElementsByTagName("CNPJ")[1]?.textContent.trim();
+                    const valorNota = xmlDoc.getElementsByTagName("vPag")[0]?.textContent.trim();
+    
+                    // Verificar se já existe uma nota com o mesmo número para o mesmo cliente
+                    let notaExistente = false;
+                    const linhasTabela = tabela.getElementsByTagName("tr");
+    
+                    for (const linha of linhasTabela) {
+                        const colunaCliente = linha.cells[0]?.textContent.trim();
+                        const colunaNumeroNota = linha.cells[2]?.textContent.trim();
+    
+                        if (colunaCliente === cliente && colunaNumeroNota === numeroNota) {
+                            notaExistente = true;
+                            break;
+                        }
+                    }
+    
+                    if (!notaExistente) {
+                        // Se não encontrou nenhuma nota com o mesmo número para o mesmo cliente, adiciona
+                        const novaLinha = tabela.insertRow();
+                        const colunas = [
+                            cliente,
+                            formatarData(dataEmissao),
+                            numeroNota,
+                            `${bairro} - ${municipio}`,
+                            formatarCNPJString(cnpjDest),
+                            formatarMoeda(valorNota)
+                        ];
+    
+                        colunas.forEach(texto => {
+                            let cell = novaLinha.insertCell();
+                            cell.textContent = texto;
+                        });
+    
+                        adicionarBotoesAcao(novaLinha);
+    
+                        contadorNotasImportadas++; // Incrementa o contador
+                    }
+    
+                } catch (error) {
+                    console.error(`Erro ao processar o arquivo: ${arquivo.name}. Verifique se é um XML de NFe válido.`);
+                }
+            };
+    
+            leitor.readAsText(arquivo);
         }
-
-        input.value = formatarCNPJString(numero);
-    }
-
-    function formatarCNPJString(numero) {
-        if (numero.length === 11) { // CPF
-            return numero.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
-        } else if (numero.length === 14) { // CNPJ
-            return numero.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
+    
+        // Atualizar a label com a quantidade de notas importadas
+        const label = document.getElementById("label-notas-importadas");
+        if (label) {
+            label.textContent = `Notas importadas corretamente: ${contadorNotasImportadas}`;
         }
-        return numero;
+    }
+    
+    
+
+
+
+    function formatarData(data) {
+        const partes = data.split("-");
+        return partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : data;
     }
 
+
+
+    function formatarMoeda(valor) {
+        return parseFloat(valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    }
+
+
+
+    function formatarCNPJString(cnpj) {
+        cnpj = cnpj.replace(/\D/g, "");
+        return `${cnpj.slice(0, 2)}.${cnpj.slice(2, 5)}.${cnpj.slice(5, 8)}/${cnpj.slice(8, 12)}-${cnpj.slice(12, 14)}`;
+    }
+
+    if (uploadBtn) {
+        uploadBtn.addEventListener("click", selecionarArquivosXML);
+    }
+
+    
     carregarScriptMovimentacoes();
 });

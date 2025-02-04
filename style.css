@@ -13,34 +13,43 @@ body {
 
 .sidebar {
     height: 100%;
-    width: 220px;
+    width: 75px;
     position: fixed;
     top: 0;
     left: 0;
     background-color: #2c3e50;
     padding-top: 20px;
-    transition: 0.3s;
+    transition: width 0.3s ease;
     z-index: 1000;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.sidebar:hover {
+    width: 220px;
 }
 
 .sidebar a {
-    padding: 29px 25px;
+    padding: 15px;
     text-decoration: none;
     color: #e9eef1;
     display: flex;
     align-items: center;
     transition: 0.2s;
     white-space: nowrap;
-}
-
-.sidebar a:first-child {
-    margin-top: 45px;
+    overflow: hidden;
 }
 
 .sidebar a .icon {
     font-size: 1.4em;
-    min-width: 40px;
+    min-width: 50px;
+    text-align: center;
+    margin-right: 10px;
+}
+
+.sidebar a:first-child {
+    margin-top: 45px;
 }
 
 .sidebar a:hover {
@@ -49,11 +58,11 @@ body {
 }
 
 .main-content {
-    margin-left: 200px;
+    margin-left: 70px;
     padding: 50px 40px;
     min-height: 100vh;
     background-color: #f5f6fa;
-    transition: margin-left 0.3s;
+    transition: none;
 }
 
 .btn {
@@ -105,8 +114,17 @@ h3 {
     display: flex;
     flex-direction: column;
     margin-bottom: 1.1rem;
-    width: 200px;
+    width: 100%; /* Tamanho flexível para os outros campos */
     gap: 8px;
+}
+
+.input-group > .input-select,
+.input-group > .input-box {
+    width: 31%; /* Ajusta o tamanho para os três primeiros campos */
+}
+
+.input-group > .input-select {
+    width: 30%; /* Ajuste para o campo "Cliente Emissor" */
 }
 
 .input-box input,
@@ -115,15 +133,23 @@ h3 {
     border: none;
     border-radius: 10px;
     box-shadow: 1px 1px 6px #0000001c;
+    min-width: 100px; /* Define o tamanho mínimo */
 }
 
-.input-box input:hover,
-.input-group select:hover {
-    background-color: #eeeeee75;
+.input-group .input-select,
+.input-group .input-box {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 
-.input-box input:focus-visible {
-    outline: 1px solid #34495e;
+.input-group input,
+.input-group select {
+    width: 100%; /* Faz com que os campos de input e select usem 100% da largura disponível */
+}
+
+label {
+    font-size: 0.9rem; /* Diminuído o tamanho da fonte das labels */
 }
 
 .div-tabela {
@@ -142,6 +168,7 @@ h3 {
     background-color: #34495e;
     color: white;
     text-align: center;
+    font-size: 0.9rem;
 }
 
 #tabela-movimentacoes th,
@@ -180,11 +207,21 @@ h3 {
 @media screen and (max-width: 768px) {
     .sidebar {
         left: -250px;
+        width: 220px;
+    }
+
+    .sidebar:hover {
+        width: 220px;
+    }
+
+    .sidebar:hover a span {
+        opacity: 1;
     }
 
     .main-content {
         margin-left: 0px;
-        padding: 100px;
+        padding-top: 60px;  /* Modificado de 100px para 20px */
+        transition: none;
     }
 
     .toggle-btn {
@@ -196,9 +233,5 @@ h3 {
 
     .sidebar.active {
         left: 0;
-    }
-
-    .main-content.active {
-        margin-left: 400px;
     }
 }
