@@ -9,8 +9,10 @@
 
 body {
     transition: all 0.3s;
+    display: none;
 }
 
+/* Adiciona a transição de abertura ao menu */
 .sidebar {
     height: 100%;
     width: 75px;
@@ -26,7 +28,8 @@ body {
     white-space: nowrap;
 }
 
-.sidebar:hover {
+/* Expande o menu ao passar o mouse */
+.sidebar:hover, .sidebar.open {
     width: 220px;
 }
 
@@ -56,6 +59,7 @@ body {
     background-color: #34495e;
     color: #ecf0f1;
 }
+
 
 .main-content {
     margin-left: 70px;

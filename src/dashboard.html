@@ -3,37 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clientes</title>
+    <title>Dashboard</title>
+    <script src="/scripts/auth.js"></script><!-- Proteção da página -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/styles/style.css">
 </head>
 <body>
-    <div class="toggle-btn" style="color:black">
-        ☰
-    </div>
+    <div class="toggle-btn" style="color:black">☰</div>
 
     <nav class="sidebar">
-        <a href="index.html">
+        <a href="/src/index.html">
             <span class="icon"><i class="bi bi-house"></i></span>
             <span class="text">Home</span>
         </a>
-        <a href="dashboard.html">
+        <a href="/src/dashboard.html">
             <span class="icon"><i class="bi bi-columns-gap"></i></span>
             <span class="text">Dashboard</span>
         </a>
-        <a href="clientes.html">
+        <a href="/src/clientes.html">
             <span class="icon"><i class="bi bi-person-circle"></i></span>
             <span class="text">Clientes</span>
         </a>
-        <a href="movimentacoes.html">
+        <a href="/src/movimentacoes.html">
             <span class="icon"><i class="bi bi-cash-coin"></i></span>
             <span class="text">Movimentações</span>
         </a>
-        <a href="consulta.html">
+        <a href="/src/consulta.html">
             <span class="icon"><i class="bi bi-search"></i></i></span>
             <span class="text">Consulta</span>
         </a>
-        <a href="configuracoes.html">
+        <a href="/src/configuracoes.html">
             <span class="icon"><i class="bi bi-gear"></i></span>
             <span class="text">Configurações</span>
         </a>
@@ -41,13 +40,9 @@
 
     <div class="main-content">
         <h1>ERP para FG Assessoria Contábil</h1>
-        <h2>Aqui estará a confiração de cada cliente</h2>
-        <ul>
-            <br>
-            <li>Cadastro de clientes</li>
-            <li>Edição de dados de clientes</li>
-        </ul>
+        <h2>Aqui ficará o dashboard de cada cliente</h2>
     </div>
 </body>
-<script src="script.js"></script>
+<script src="/scripts/auth.js"></script> <!-- Proteção da página -->
+<script src="/scripts/script.js"></script>
 </html>
