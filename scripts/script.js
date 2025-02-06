@@ -111,7 +111,7 @@ document.addEventListener("DOMContentLoaded", function () {
         
         colunasEditaveis.forEach(index => {
           const cell = linha.cells[index];
-          const valorAtual = cell.textContent; // Armazena o valor original
+          const valorAtual = cell.textContent; 
           const input = document.createElement("input");
           
           input.type = "text";
@@ -124,7 +124,6 @@ document.addEventListener("DOMContentLoaded", function () {
           input.addEventListener("blur", function () {
             let novoValor = input.value.trim();
             
-            // Se o campo ficar vazio, restaura o valor original
             if (novoValor === "") {
               cell.textContent = valorAtual;
               atualizarTotal();

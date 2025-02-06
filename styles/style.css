@@ -229,6 +229,33 @@ label {
     margin-left: 5px;
 }
 
+
+.filtros {
+    display: flex;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.filtros label {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.filtros select {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
 @media screen and (max-width: 768px) {
     .sidebar {
         left: -250px;

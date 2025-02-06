@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-    <script src="/scripts/auth.js"></script><!-- Proteção da página -->
+    <title>Consulta</title>
+    <script src="/scripts/auth.js"></script> <!-- Proteção da página -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/styles/style.css">
 </head>
@@ -29,7 +29,7 @@
             <span class="text">Movimentações</span>
         </a>
         <a href="/src/consulta.html">
-            <span class="icon"><i class="bi bi-search"></i></i></span>
+            <span class="icon"><i class="bi bi-search"></i></span>
             <span class="text">Consulta</span>
         </a>
         <a href="/src/configuracoes.html">
@@ -39,16 +39,78 @@
     </nav>
 
     <div class="main-content">
-        <h1>ERP para FG Assessoria Contábil</h1>
-        <h2>Irei adicionar algumas funcionalidades nos próximos dias</h2>
-        <ul>
-            <br>
-            <li>Movimentações financeiras</li>
-            <li>Arquivamento de notas e xml</li>
-            <li>Consolidado de faturamento</li>
-        </ul>
+        <h1>Consulta de Notas Fiscais</h1>
+
+        <!-- Filtros -->
+        <div class="input-group">
+            <div class="input-select">
+                <label for="cliente">Cliente</label>
+                <select id="cliente">
+                    <option value="">Selecione um cliente</option>
+                    <option value="1">Cliente 1</option>
+                    <option value="2">Cliente 2</option>
+                    <option value="3">Cliente 3</option>
+                </select>
+            </div>
+            <div class="input-box">
+                <label for="data-de">De</label>
+                <input type="date" id="data-de">
+            </div>
+            <div class="input-box">
+                <label for="data-ate">Até</label>
+                <input type="date" id="data-ate">
+            </div>
+            <div class="btn">
+                <button id="btn-consultar">Consultar</button>
+            </div>
+        </div>
+
+        <h2>Total por Município</h2>
+        <div class="div-tabela" style="max-width: 400px">
+            <table id="tabela-municipios">
+                <thead>
+                    <tr>
+                        <th>Município</th>
+                        <th>Total (R$)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Linhas dinâmicas via JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Tabela de notas fiscais no período -->
+        <h2>Notas Fiscais no Período</h2>
+        <div class="div-tabela">
+            <table id="tabela-movimentacoes">
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Data</th>
+                        <th>Tipo Nota</th>
+                        <th>Número Nota</th>
+                        <th>Município</th>
+                        <th>CNPJ</th>
+                        <th>Valor</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Linhas dinâmicas via JS -->
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="5"><strong>Total Geral:</strong></td>
+                        <td id="totalValor">R$ 0,00</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
     </div>
+
+    <script src="/scripts/auth.js"></script> <!-- Proteção da página -->
+    <script src="/scripts/script.js"></script>
+    <script src="/scripts/search.js"></script> <!-- Script da consulta -->
 </body>
-<script src="/scripts/auth.js"></script> <!-- Proteção da página -->
-<script src="/scripts/script.js"></script>
 </html>
