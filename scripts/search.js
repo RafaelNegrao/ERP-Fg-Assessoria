@@ -22,12 +22,10 @@
         { id: 4, nome: "Cliente 1", municipio: "São José", uf: "SP", cnpj: "33.333.333/0001-04", valor: 5000, data: "2024-02-04", tipoNota: "Saída", numeroNota: "1004" }
     ];
 
-    // Função para formatar moeda
     function formatarMoeda(valor) {
         return `R$ ${parseFloat(valor.replace("R$ ", "").replace(".", "").replace(",", ".")).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
     }
 
-    // Função para atualizar as tabelas com base no filtro de cliente e período
     function atualizarTabelas() {
         const tabelaMovimentos = document.querySelector("#tabela-movimentacoes tbody");
         const tabelaMunicipios = document.querySelector("#tabela-municipios tbody");
@@ -53,7 +51,6 @@
             return;
         }
 
-        // Criar tabela de movimentações
         dadosFiltrados.forEach(dado => {
             const row = document.createElement("tr");
             row.innerHTML = `
@@ -71,7 +68,6 @@
             // Somar valor total
             totalGeral += parseFloat(dado.valor.replace("R$ ", "").replace(".", "").replace(",", "."));
 
-            // Agrupar por município
             const chaveMunicipio = dado.municipio;
             if (!totaisMunicipios[chaveMunicipio]) {
                 totaisMunicipios[chaveMunicipio] = 0;
@@ -79,10 +75,8 @@
             totaisMunicipios[chaveMunicipio] += parseFloat(dado.valor.replace("R$ ", "").replace(".", "").replace(",", "."));
         });
 
-        // Atualizar total geral
         document.getElementById("totalValor").textContent = formatarMoeda(`R$ ${totalGeral}`);
 
-        // Criar tabela de totais por município
         Object.keys(totaisMunicipios).forEach(municipio => {
             const row = document.createElement("tr");
             row.innerHTML = `

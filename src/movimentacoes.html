@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Movimentações</title>
     <script src="/scripts/auth.js"></script> <!-- Proteção da página -->
-    <link rel="stylesheet" href="/styles/style.css">
+    <link rel="stylesheet" href="/styles/trades.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 </head>
 <body>
@@ -38,14 +38,11 @@
         </a>
     </nav>
 
-
-    <div class="main-content">
-        
+    <div class="main-content-mov">
         <form id="movimentacao-form">
             <h2>Movimentações</h2>
-            <div class="input-group">
-                
-                <div class="input-select">
+            <div class="inputs">
+                <div class="input-group">
                     <label for="cliente">Cliente Emissor:</label>
                     <select id="cliente" required>
                         <option value="">Selecione um cliente</option>
@@ -54,16 +51,16 @@
                         <option value="Pan-dai">Pan-dai</option>
                     </select>
                 </div>
+            
                 <div class="btn">
-                    <div class="btn-upload-xml">
+                    <div class="btn-upload-xml" title="Upload de arquivos XML">
                         <button type="button" id="uploadXml"><i class="bi bi-upload"></i></button>
                     </div>
-                    <div class="btn-salvar-manualmente">
-                        <button type="button" id="salvarMovimentacao"><i class="bi bi-pencil-square"></i></button>
+                    <div class="btn-salvar-manualmente" title="Clique para adicionar itens manualmente">
+                        <button type="button" id="btn-abrir-modal"><i class="bi bi-pencil-square"></i></button>
                     </div>
-                    
                 </div>
-                </div>
+            </div>
             
             
         </form>
@@ -92,7 +89,44 @@
                 </tfoot>
             </table>
         </div>
+    </div>
+    <div class="overlay hidden"></div>
+        <div class="tela-lancamento-manual" hidden="true">
+            <p>Lançamento Manual</p>
+            <div class="campos">
+                <div>
+                    <input class="cnpj" placeholder="CNPJ"></input>
+                </div>
+                <div>
+                    <input type="date" id="data-de" placeholder="Data">
+                </div>
+                <div>
+                    <select id="tipo" required>
+                        <option value="" disabled selected>Tipo de nota</option>
+                        <option value="PRODUTO">PRODUTO</option>
+                        <option value="SERVIÇO">SERVIÇO</option>
+                    </select>
+                </div>
+                <div>
+                    <input class="numeroNf" placeholder="Número NF"></input>
+                </div>
+                <div>
+                    <input class="municipio" placeholder="Município"></input>
+                </div>
+                <div>
+                    <input class="valor" placeholder="Valor"></input>
+                </div>
+            </div>
+                <div class="btn-salvar">
+                    <button type="button" id="btn-salvar-manual"><i class="bi bi-save"></i></button>
+                </div>
+        </div>
+
+
               
     <script src="/scripts/script.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    
 </body>
 </html>

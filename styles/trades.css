@@ -1,0 +1,356 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    transition: all 0.3s;
+    display: none;
+}
+
+/* Adiciona a transição de abertura ao menu */
+.sidebar {
+    height: 100%;
+    width: 75px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #2c3e50;
+    padding-top: 20px;
+    transition: width 0.3s ease;
+    z-index: 1000;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.sidebar:hover, .sidebar.open {
+    width: 220px;
+}
+
+.sidebar a {
+    padding: 15px;
+    text-decoration: none;
+    color: #e9eef1;
+    display: flex;
+    align-items: center;
+    transition: 0.2s;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.sidebar a .icon {
+    font-size: 1.4em;
+    min-width: 50px;
+    text-align: center;
+    margin-right: 10px;
+}
+
+.sidebar a:first-child {
+    margin-top: 45px;
+}
+
+.sidebar a:hover {
+    background-color: #34495e;
+    color: #ecf0f1;
+}
+
+.main-content-mov {
+    margin-left: 70px;
+    padding: 50px 40px;
+    min-height: 100vh;
+    background-color: #f5f6fa;
+    transition: none;
+}
+.main-content-mov > .input-group{
+    display: flex;
+}
+
+.btn {
+    display: flex;
+    gap: 10px;
+    align-items: center; 
+}
+
+.btn button {
+    background-color: #34495e;
+    color: white;
+    font-size: 16px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.btn button:hover {
+    background-color: #2c3e50;
+}
+
+
+.inputs {
+    justify-content: space-between;
+    display: flex;
+    align-items: flex-end;
+    gap: 15px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column; 
+}
+
+.inputs label {
+    margin-bottom: 5px; 
+    font-size: 0.9rem;
+}
+
+#cliente {
+    width: 400px; 
+    padding: 10px;
+    border-radius: 10px;
+}
+
+h2 {
+    margin-left: 15px;
+}
+
+h3 {
+    margin: 20px 0 10px;
+}
+
+.inputs ,.input-box{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 1rem;
+    gap: 15px;
+}
+
+
+.inputs input,
+.inputs select {
+    padding: 0.8rem 1rem;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 1px 1px 6px #0000001c;
+    min-width: 100px; 
+}
+
+
+.div-tabela {
+    margin: 0 1rem;
+}
+
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: none;
+}
+
+.tela-lancamento-manual p{
+    margin-bottom: 20px;
+}
+.tela-lancamento-manual {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    display: none;
+
+}
+
+.tela-lancamento-manual.visible,
+.overlay.visible {
+    display: block;
+}
+
+.campos {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 15px;
+    width: 100%;
+    justify-content: center;
+}
+
+.campos input, .campos select {
+    width: 100%; 
+    height: 45px;
+    box-shadow: 1px 1px 6px #0000001c;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    padding: 8px;
+    font-size: 14px;
+}
+
+.btn-salvar {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end; 
+    margin-top: 20px;
+}
+
+.btn-salvar button {
+    background-color: #34495e;
+    color: white;
+    font-size: 16px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.btn-salvar button:hover {
+    background-color: #2c3e50;
+}
+
+#tabela-movimentacoes {
+    width: 100%;
+    border-collapse: collapse;
+    box-shadow: 1px 1px 6px #0000001c;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+#tabela-movimentacoes thead {
+    background-color: #34495e;
+    color: white;
+    text-align: center;
+    font-size: 0.80rem;
+}
+
+#tabela-movimentacoes th,
+#tabela-movimentacoes td {
+    padding: 1rem;
+    font-size: 0.80rem;
+    text-align: center;
+    width: auto; 
+    white-space: nowrap; 
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+#tabela-movimentacoes td {
+    border-bottom: 1px solid #ccc;
+    font-size: 0.8rem;
+}
+
+#tabela-movimentacoes tbody tr:nth-child(odd) {
+    background-color: #f9f9f9;
+}
+
+#tabela-movimentacoes tbody tr:nth-child(even) {
+    background-color: #ffffff;
+}
+
+#tabela-movimentacoes tbody tr:hover {
+    background-color: #eeeeee75;
+}
+
+#tabela-movimentacoes thead,
+#tabela-movimentacoes tfoot {
+    display: table;
+    width: 100%;
+    table-layout: fixed; 
+}
+
+#tabela-movimentacoes tbody {
+    display: block;
+    max-height: 300px; 
+    overflow-y: auto;
+    width: 100%;
+}
+
+#tabela-movimentacoes tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed; 
+}
+
+.toggle-btn {
+    position: fixed;
+    left: 20px;
+    top: 20px;
+    font-size: 28px;
+    cursor: pointer;
+    display: none;
+    z-index: 1001;
+    color: #2c3e50;
+    margin-left: 5px;
+}
+
+
+.filtros {
+    display: flex;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.filtros label {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.filtros select {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+@media screen and (max-width: 768px) {
+    .sidebar {
+        left: -250px;
+        width: 220px;
+    }
+
+    .sidebar:hover {
+        width: 220px;
+    }
+
+    .sidebar:hover a span {
+        opacity: 1;
+    }
+
+    .main-content {
+        margin-left: 0px;
+        padding-top: 60px;  
+        transition: none;    
+    }
+
+    .toggle-btn {
+        display: block;
+        color: #ecf0f1;
+        cursor: pointer;
+        transition: color 0.3s ease-in-out, background-color 0.3s ease-in-out;
+    }
+
+    .sidebar.active {
+        left: 0;
+    }
+    
+}

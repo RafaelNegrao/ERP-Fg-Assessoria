@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const sidebar = document.querySelector(".sidebar");
     const links = document.querySelectorAll(".sidebar a");
     const uploadBtn = document.getElementById("uploadXml");
+    
   
     toggleBtn.addEventListener("click", function () {
       sidebar.classList.toggle("active");
@@ -384,7 +385,116 @@ document.addEventListener("DOMContentLoaded", function () {
         toggleBtn.style.color = "black";
       }
     }
+
+
+    document.getElementById('btn-abrir-modal').addEventListener('click', () => {
+      document.querySelector('.tela-lancamento-manual').classList.add('visible');
+      document.querySelector('.overlay').classList.add('visible');
+  });
   
-    carregarScriptMovimentacoes();
+  document.querySelector('.overlay').addEventListener('click', () => {
+      document.querySelector('.tela-lancamento-manual').classList.remove('visible');
+      document.querySelector('.overlay').classList.remove('visible');
+  });
+  
+
+  $('.cnpj').mask('00.000.000/0000-00', {reverse: true});
+  $(document).ready(function() {
+    $('.valor').mask('000.000.000.000.000,00', {reverse: true});
+  });
+
+  $(document).ready(function () {
+    $(".numeroNf").on("input", function () {
+        this.value = this.value.replace(/\D/g, ""); 
+    });
+});  
+
+
+
+document.getElementById("btn-salvar-manual").addEventListener("click", function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  salvarLancamentoManual();
+});
+
+function salvarLancamentoManual() {
+  let cliente = "";
+
+  let modal = document.querySelector(".tela-lancamento-manual");
+  let cnpjInput      = modal.querySelector(".cnpj");
+  let dataInput      = modal.querySelector("#data-de");
+  let tipoSelect     = modal.querySelector("#tipo");
+  let numeroNfInput  = modal.querySelector(".numeroNf");
+  let municipioInput = modal.querySelector(".municipio");
+  let valorInput     = modal.querySelector(".valor");
+
+
+  let cnpj      = cnpjInput      ? cnpjInput.value.trim() : "";
+  let data      = dataInput      ? dataInput.value.trim() : "";
+  let tipo      = tipoSelect     ? tipoSelect.value : "";
+  let numeroNf  = numeroNfInput  ? numeroNfInput.value.trim() : "";
+  let municipio = municipioInput ? municipioInput.value.trim() : "";
+  let valor     = valorInput     ? valorInput.value.trim() : "";
+
+
+  if (!cnpj || !data || !tipo || !numeroNf || !municipio || !valor) {
+      alert("Preencha todos os campos do lançamento manual.");
+      return false;
+  }
+
+  if (typeof formatarData === 'function') {
+      data = formatarData(data);
+  }
+ 
+
+  let tbody = document.getElementById("tabela-movimentacoes").getElementsByTagName("tbody")[0];
+  let novaLinha = tbody.insertRow();
+
+  let dados = [cliente, data, tipo, numeroNf, municipio, cnpj, valor];
+  dados.forEach(function(texto) {
+      let cell = novaLinha.insertCell();
+      cell.textContent = texto;
+  });
+
+  
+  let actionsCell = novaLinha.insertCell();
+
+  let btnEditar = document.createElement("span");
+  btnEditar.innerHTML = `<i class="bi bi-pencil-square"></i>`;
+  btnEditar.style.cursor = "pointer";
+  btnEditar.style.marginRight = "10px";
+  btnEditar.title = "Editar";
+  btnEditar.onclick = function() {
+      editarLinha(novaLinha);
+  };
+
+  let btnExcluir = document.createElement("span");
+  btnExcluir.innerHTML = `<i class="bi bi-x-circle"></i>`;
+  btnExcluir.style.cursor = "pointer";
+  btnExcluir.title = "Excluir";
+  btnExcluir.onclick = function() {
+      novaLinha.remove();
+      if (typeof atualizarTotal === 'function') {
+          atualizarTotal();
+      }
+  };
+
+  actionsCell.appendChild(btnEditar);
+  actionsCell.appendChild(btnExcluir);
+
+  if (typeof atualizarTotal === 'function') {
+      atualizarTotal();
+  }
+
+  if (cnpjInput)      cnpjInput.value = "";
+  if (dataInput)      dataInput.value = "";
+  if (tipoSelect)     tipoSelect.selectedIndex = 0; 
+  if (numeroNfInput)  numeroNfInput.value = "";
+  if (municipioInput) municipioInput.value = "";
+  if (valorInput)     valorInput.value = "";
+}
+
+
+  carregarScriptMovimentacoes();
   });
   
